@@ -33,10 +33,26 @@
                     <div class="card m-1">
                         <div class="card-body">
                             {{ task.task }}
-                            <span style="position: relative; float: right;">
-                                <a class="btn btn-success"><i class="fa fa-check"></i> Mark as Done</a>
-                                <a class="btn btn-danger"><i class="fa fa-trash"></i></a>
-                                <a class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+                            <span style="position: relative; float: right; display: flex; gap: 5px;">
+                                <!-- Alles, was unmittelbar zu Datenänderungen führt, sollte mit POST-Requests gesendet werden.
+                                Weitere Infos in todo/views.py -->
+                                <form action="{% url 'completeTask' task.pk %}" method="POST">
+                                    
+                                    <!-- CSRF = Cross-Site Request Forgery -> Cyberangriffstechnik, bei dem der Angreifer versucht, einen Request an eine andere Webseite zu senden, 
+                                    um dort unerwünschte Aktionen durchzuführen
+                                    Beispiel: Angreifer baut eine harmlos aussehende Webseite, die eine Form enthält, deren action Attribut auf eine andere Webseite verweist und 
+                                    dort schaden anrichten:
+                                    <form method="post" action="https://deine-app.com/deleteTask/1">
+                                        <input type="submit" value="Click me!">
+                                    </form> -->
+                                    {% csrf_token %}
+                                    <button class="btn btn-success"><i class="fa fa-check"></i> Mark as Done</button>
+                                </form>
+                                <form action="{% url 'deleteTask' task.pk %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                </form>
+                                <a class="btn btn-primary" href="{% url 'editTask' task.pk %}"><i class="fa fa-pencil"></i></a>
                             </span>
                         </div>
                     </div>
@@ -46,11 +62,21 @@
             <div class="col-md-5 col-lg-5">
                 <h5>Completed Tasks</h5>
                 <!-- List of all the tasks that have completed -->
-                <div class="card m-1">
-                    <div class="card-body">
-                        This is the completed task.
+                
+                {% for task in completed_tasks %}
+                    <div class="card m-1">
+                        <div class="card-body">
+                            {{ task.task }}
+                            <span style="position: relative; float: right; display: flex;">
+                                <form action="{% url 'markTaskUndone' task.pk %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="btn btn-warning"><i class="fa fa-times"></i> Mark as Undone</button>
+                                </form>
+                            </span>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
+
             </div>
         </div>
         <div class="row">
